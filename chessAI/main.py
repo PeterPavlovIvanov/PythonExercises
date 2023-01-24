@@ -1,135 +1,82 @@
 import pygame
 
-# CONSTANTS
-window_size = (610, 610)
-ss = 70  # square side
-spa = 25  # square position adjustment
-background_color = (153, 107, 0)
-white_square_color = (255, 245, 219)
-black_square_color = (214, 171, 62)
-dpap_x = 19  # draw piece adjustment pointer
-dpap_y = 4  # draw piece adjustment pointer
-black_rook = pygame.image.load("res/pieces/black_rook.png")
-black_knight = pygame.image.load("res/pieces/black_knight.png")
-black_bishop = pygame.image.load("res/pieces/black_bishop.png")
-black_queen = pygame.image.load("res/pieces/black_queen.png")
-black_king = pygame.image.load("res/pieces/black_king.png")
-black_pawn = pygame.image.load("res/pieces/black_pawn.png")
-white_rook = pygame.image.load("res/pieces/white_rook.png")
-white_knight = pygame.image.load("res/pieces/white_knight.png")
-white_bishop = pygame.image.load("res/pieces/white_bishop.png")
-white_queen = pygame.image.load("res/pieces/white_queen.png")
-white_king = pygame.image.load("res/pieces/white_king.png")
-white_pawn = pygame.image.load("res/pieces/white_pawn.png")
+from Constants import *
+from models.Board import Board
+from models.pieces.Bishop import Bishop
+from models.pieces.King import King
+from models.pieces.Knight import Knight
+from models.pieces.Pawn import Pawn
+from models.pieces.Queen import Queen
+from models.pieces.Rook import Rook
 
 
-# Initialize screen
-pygame.init()
-screen = pygame.display.set_mode(window_size)
+def create_board_surface():
+    board_surface = pygame.Surface((SQUARE_SIZE * ROWS, SQUARE_SIZE * COLS))
+    dark = False
+    for r in range(ROWS):
+        for c in range(COLS):
+            rect = pygame.Rect(r * SQUARE_SIZE, c * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
+            pygame.draw.rect(board_surface, pygame.Color(BLACK_SQUARE_COLOR if dark else WHITE_SQUARE_COLOR), rect)
+            dark = not dark
+        dark = not dark
+    return board_surface
 
 
-# draws text
-def draw_text(surface, text, pos, font):
-    text = str(text)
-    text_surface = font.render(text, True, (255, 255, 255))
-    text_rect = text_surface.get_rect()
-    text_rect.midtop = pos
-    surface.blit(text_surface, text_rect)
+def drag_piece(screen, selected_piece, drag_pos):
+    if not selected_piece is None:
+        screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
 
 
-# draws a piece
-def draw_piece(symbol, pos):
-    row = int((pos / 8) - 0.1)
-    x_index_ = 8 if pos % 8 == 0 else pos % 8
-    x_pos = (x_index_ * ss) + dpap_x - black_rook.get_width()
-    y_pos = (row * ss) + dpap_y + (black_rook.get_width() / 2)
-    if symbol == 'r':
-        screen.blit(black_rook, (x_pos, y_pos))
-    elif symbol == 'n':
-        screen.blit(black_knight, (x_pos, y_pos))
-    elif symbol == 'b':
-        screen.blit(black_bishop, (x_pos, y_pos))
-    elif symbol == 'q':
-        screen.blit(black_queen, (x_pos, y_pos))
-    elif symbol == 'k':
-        screen.blit(black_king, (x_pos, y_pos))
-    elif symbol == 'p':
-        screen.blit(black_pawn, (x_pos, y_pos))
-    elif symbol == 'R':
-        screen.blit(white_rook, (x_pos, y_pos))
-    elif symbol == 'N':
-        screen.blit(white_knight, (x_pos, y_pos))
-    elif symbol == 'B':
-        screen.blit(white_bishop, (x_pos, y_pos))
-    elif symbol == 'Q':
-        screen.blit(white_queen, (x_pos, y_pos))
-    elif symbol == 'K':
-        screen.blit(white_king, (x_pos, y_pos))
-    elif symbol == 'P':
-        screen.blit(white_pawn, (x_pos, y_pos))
+def main():
+    screen = pygame.display.set_mode((610, 610))
+    board = Board()
+    board_surface = create_board_surface()
+    clock = pygame.time.Clock()
+    selected_piece = None
+    square_y = -1
+    square_x = -1
+    prev_square_x = -1
+    prev_square_y = -1
+    while True:
+        cur_pos = pygame.mouse.get_pos()
+        events = pygame.event.get()
+        cur_x = cur_pos[0] - BOARD_ADJUSTMENT
+        cur_y = cur_pos[1] - BOARD_ADJUSTMENT
+        for e in events:
+            if e.type == pygame.QUIT:
+                return
+            elif e.type == pygame.MOUSEBUTTONDOWN:
+                square_y = int(cur_x / SQUARE_SIZE)
+                square_x = int(cur_y / SQUARE_SIZE)
+                selected_piece = board.matrix[square_x][square_y]
+            elif e.type == pygame.MOUSEBUTTONUP:
+                if selected_piece is None:
+                    continue
+                prev_square_x = square_x  # previous position
+                prev_square_y = square_y  # previous position
+                if 0 <= prev_square_y < 8 and 0 <= prev_square_x < 8:
+                    square_y = int(cur_x / SQUARE_SIZE)  # take new square position for the piece
+                    square_x = int(cur_y / SQUARE_SIZE)  # take new square position for the piece
+                    new_color = '' if board.matrix[square_x][square_y] is None else board.matrix[square_x][square_y].color
+                    if not new_color == board.matrix[prev_square_x][prev_square_y].color:  # there should be no aly piece there
+                        if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y), board.matrix):
+                            board.matrix[prev_square_x][prev_square_y] = None  # remove piece from previous position
+                            selected_piece.new_position((square_x, square_y))  # prepare new piece position
+                            board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+
+                    selected_piece = None  # Remove piece from hand
+
+        screen.fill(BACKGROUND_COLOR)
+        screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
+        board.draw_board(screen)
+
+        drag_piece(screen, selected_piece, (cur_x, cur_y))
+
+        pygame.display.flip()
+        clock.tick(60)
+        pygame.display.update()
 
 
-# converts the damn numbers to letters
-def damn_letters(index):
-    if index == 1:
-        return "a"
-    elif index == 2:
-        return "b"
-    elif index == 3:
-        return "c"
-    elif index == 4:
-        return "d"
-    elif index == 5:
-        return "e"
-    elif index == 6:
-        return "f"
-    elif index == 7:
-        return "g"
-    elif index == 8:
-        return "h"
 
-
-# Initialize board
-font = pygame.font.Font(pygame.font.get_default_font(), 22)
-screen.fill(background_color)
-for r in range(0, 8):
-    for c in range(0, 8):
-        if (r + c) % 2 == 0:
-            square_color = white_square_color
-        else:
-            square_color = black_square_color
-        pygame.draw.rect(screen, square_color, pygame.Rect(r * ss + spa, c * ss + spa, ss, ss))
-
-
-# side letters and numbers
-for i in range(97, 105):
-    index = i - 96
-    draw_text(screen, str(index), (spa + (index * ss - (ss/2)), 2), font)
-    draw_text(screen, str(index), (spa + (index * ss - (ss/2)), 666), font)
-    draw_text(screen, damn_letters(index), (677, spa + (index * ss - (ss/2)) - 10), font)
-    draw_text(screen, damn_letters(index), (12.5, spa + (index * ss - (ss/2)) - 10), font)
-
-
-# Chess pieces
-starting_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
-position_counter = 1
-for symbol in starting_FEN:
-    if symbol.isdigit():
-        position_counter = position_counter + int(symbol)
-    elif symbol == '/':
-        pass
-    else:
-        draw_piece(symbol, position_counter)
-        position_counter = position_counter + 1
-
-
-pygame.display.flip()  # maybe draws ??
-game_over = False
-while not game_over:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game_over = True
-
-
-if game_over:
-    pygame.quit()
+if __name__ == '__main__':
+    main()
