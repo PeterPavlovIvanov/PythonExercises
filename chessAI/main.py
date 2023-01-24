@@ -37,6 +37,7 @@ def main():
     square_x = -1
     prev_square_x = -1
     prev_square_y = -1
+    prev_piece = None
     while True:
         cur_pos = pygame.mouse.get_pos()
         events = pygame.event.get()
@@ -48,7 +49,9 @@ def main():
             elif e.type == pygame.MOUSEBUTTONDOWN:
                 square_y = int(cur_x / SQUARE_SIZE)
                 square_x = int(cur_y / SQUARE_SIZE)
-                selected_piece = board.matrix[square_x][square_y]
+                selected_piece = board.matrix[square_x][square_y]  # duplicates the piece from the board in the hand
+                prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
+                board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
             elif e.type == pygame.MOUSEBUTTONUP:
                 if selected_piece is None:
                     continue
@@ -58,18 +61,32 @@ def main():
                     square_y = int(cur_x / SQUARE_SIZE)  # take new square position for the piece
                     square_x = int(cur_y / SQUARE_SIZE)  # take new square position for the piece
                     new_color = '' if board.matrix[square_x][square_y] is None else board.matrix[square_x][square_y].color
-                    if not new_color == board.matrix[prev_square_x][prev_square_y].color:  # there should be no aly piece there
+                    if not new_color == prev_piece.color:  # there should be no ally piece there
                         if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y), board.matrix):
-                            board.matrix[prev_square_x][prev_square_y] = None  # remove piece from previous position
+                            board.matrix[prev_square_x][prev_square_y] = None
                             selected_piece.new_position((square_x, square_y))  # prepare new piece position
                             board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+                        else:  # if the move is illegal
+                            board.matrix[prev_square_x][prev_square_y] = prev_piece
+                            square_x = prev_square_x  # retrieve previous position
+                            square_y = prev_square_y  # retrieve previous position
+                    else:  # we won't be able to capture our own pieces
+                        board.matrix[prev_square_x][prev_square_y] = prev_piece
+                        square_x = prev_square_x  # retrieve previous position
+                        square_y = prev_square_y  # retrieve previous position
+                else:  # if we go out of the board
+                    board.matrix[prev_square_x][prev_square_y] = prev_piece
+                    square_x = prev_square_x  # retrieve previous position
+                    square_y = prev_square_y  # retrieve previous position
 
-                    selected_piece = None  # Remove piece from hand
+                selected_piece = None  # Remove piece from hand
 
         screen.fill(BACKGROUND_COLOR)
         screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
         board.draw_board(screen)
 
+        # always enter dragging but only when selected_piece is not None we act inside
+        # selected_piece will become not None when left button is pressed, when released it is again set to None
         drag_piece(screen, selected_piece, (cur_x, cur_y))
 
         pygame.display.flip()
