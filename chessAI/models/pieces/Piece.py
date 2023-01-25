@@ -1,19 +1,85 @@
 import pygame
 
-from Constants import *
+import GlobalVariables
+from GlobalVariables import *
 
 
 class Piece:
-    def __init__(self, color: object, position: object, image: object) -> object:
+    def __init__(self, color: object, position: object, image: object):
         self.color = color
         self.position = position
         self.image = pygame.image.load(image)
+        self.moved = False
 
     def new_position(self, pos):
         self.position = pos
 
     def is_valid_move(self, prev_pos, new_pos, matrix):
-        pass
+        if prev_pos == new_pos:
+            return False
+
+        ppx = prev_pos[0]
+        ppy = prev_pos[1]
+
+        if self.color == 'white':  # check white king safety
+
+            r = ppx  # row counter
+            c = ppy  # col counter
+            # down right check
+            while True:
+                r = r + 1
+                c = c + 1
+                if r > 7 or c > 7:  # are we out of the board
+                    break  # we leave
+                if matrix[r][c] is not None:
+                    piece_type = str(type(matrix[r][c])).replace('__class__.', '')
+                    if piece_type == 'Bishop' or piece_type == 'Queen':  # if we meet a queen or a bishop
+                        if matrix[r][c].color == 'black':  # and is attack our king
+                            return False  # it's invalid move
+
+            r = ppx  # reset row counter
+            c = ppy  # reset col counter
+            # up left check
+            while True:
+                r = r - 1
+                c = c - 1
+                if r < 0 or c < 0:  # are we out of the board
+                    break  # we leave
+                if matrix[r][c] is not None:
+                    piece_type = str(type(matrix[r][c])).replace('__class__.', '')
+                    if piece_type == 'Bishop' or piece_type == 'Queen':  # if we meet a queen or a bishop
+                        if matrix[r][c].color == 'black':  # and is attack our king
+                            return False  # it's invalid move
+
+            r = ppx  # reset row counter
+            c = ppy  # reset col counter
+            # up right check
+            while True:
+                r = r - 1
+                c = c + 1
+                if c > 7 or r < 0:  # are we out of the board
+                    break  # we leave
+                if matrix[r][c] is not None:
+                    piece_type = str(type(matrix[r][c])).replace('__class__.', '')
+                    if piece_type == 'Bishop' or piece_type == 'Queen':  # if we meet a queen or a bishop
+                        if matrix[r][c].color == 'black':  # and is attack our king
+                            return False  # it's invalid move
+
+            r = ppx  # reset row counter
+            c = ppy  # reset col counter
+            # down left check
+            while True:
+                r = r + 1
+                c = c - 1
+                if c < 0 or r > 7:  # are we out of the board
+                    break  # we leave
+                if matrix[r][c] is not None:
+                    piece_type = str(type(matrix[r][c])).replace('__class__.', '')
+                    if piece_type == 'Bishop' or piece_type == 'Queen':  # if we meet a queen or a bishop
+                        if matrix[r][c].color == 'black':  # and is attack our king
+                            return False  # it's invalid move
+
+        return True
 
     def is_valid_diagonal_move(self, prev_pos, new_pos, matrix):
         ppx = prev_pos[0]
@@ -124,4 +190,8 @@ class Piece:
                     valid_moves.append((r, ppy))  # add if its capturable
                 break  # and in either way break
 
-        return new_pos in valid_moves
+        result = new_pos in valid_moves
+        if result and not self.moved:
+            self.moved = True
+
+        return result

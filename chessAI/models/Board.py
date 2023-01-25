@@ -4,7 +4,7 @@ from models.pieces.Knight import Knight
 from models.pieces.Pawn import Pawn
 from models.pieces.Queen import Queen
 from models.pieces.Rook import Rook
-from Constants import *
+from GlobalVariables import *
 
 
 class Board:

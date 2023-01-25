@@ -5,3 +5,6 @@ PIECE_ADJUSTMENT = 30
 BLACK_SQUARE_COLOR = (212, 148, 0)
 WHITE_SQUARE_COLOR = (252, 240, 204)
 BACKGROUND_COLOR = (128, 89, 0)
+
+w_king_position = (7, 4)
+b_king_position = (0, 4)

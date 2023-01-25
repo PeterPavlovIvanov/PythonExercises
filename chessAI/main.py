@@ -1,6 +1,6 @@
 import pygame
 
-from Constants import *
+from GlobalVariables import *
 from models.Board import Board
 from models.pieces.Bishop import Bishop
 from models.pieces.King import King

@@ -3,6 +3,8 @@ from models.pieces.Piece import Piece
 
 class Pawn(Piece):
     def is_valid_move(self, prev_pos, new_pos, matrix):
+        if not Piece.is_valid_move(self, prev_pos, new_pos, matrix):
+            return False
         ppx = prev_pos[0]
         ppy = prev_pos[1]
         npx = new_pos[0]
