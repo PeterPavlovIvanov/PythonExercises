@@ -37,6 +37,7 @@ def main():
     square_x = -1
     prev_square_x = -1
     prev_square_y = -1
+    turn = True
     prev_piece = None
     while True:
         cur_pos = pygame.mouse.get_pos()
@@ -50,8 +51,20 @@ def main():
                 square_y = int(cur_x / SQUARE_SIZE)
                 square_x = int(cur_y / SQUARE_SIZE)
                 selected_piece = board.matrix[square_x][square_y]  # duplicates the piece from the board in the hand
-                prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
-                board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
+                if turn:
+                    if selected_piece is not None:
+                        if selected_piece.color == 'white':
+                            prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
+                            board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
+                        else:
+                            selected_piece = None
+                else:
+                    if selected_piece is not None:
+                        if selected_piece.color == 'black':
+                            prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
+                            board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
+                        else:
+                            selected_piece = None
             elif e.type == pygame.MOUSEBUTTONUP:
                 if selected_piece is None:
                     continue
@@ -66,6 +79,7 @@ def main():
                             board.matrix[prev_square_x][prev_square_y] = None
                             selected_piece.new_position((square_x, square_y))  # prepare new piece position
                             board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+                            turn = not turn
                         else:  # if the move is illegal
                             board.matrix[prev_square_x][prev_square_y] = prev_piece
                             square_x = prev_square_x  # retrieve previous position
