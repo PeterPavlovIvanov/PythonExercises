@@ -9,6 +9,7 @@ from models.pieces.Pawn import Pawn
 from models.pieces.Queen import Queen
 from models.pieces.Rook import Rook
 
+white = (255, 255, 255)
 
 def create_board_surface():
     board_surface = pygame.Surface((SQUARE_SIZE * ROWS, SQUARE_SIZE * COLS))
@@ -23,7 +24,7 @@ def create_board_surface():
 
 
 def drag_piece(screen, selected_piece, drag_pos):
-    if not selected_piece is None:
+    if selected_piece is not None:
         screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
 
 
@@ -96,6 +97,7 @@ def main():
                 selected_piece = None  # Remove piece from hand
 
         screen.fill(BACKGROUND_COLOR)
+        draw_letters_on_side(screen)
         screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
         board.draw_board(screen)
 
@@ -107,6 +109,21 @@ def main():
         clock.tick(60)
         pygame.display.update()
 
+
+pygame.font.init()
+
+
+def draw_letters_on_side(screen):
+    font = pygame.font.Font(None, 22)
+    r = 8
+    while r > 0:
+        text = font.render(str(9 - r), True, white)
+        screen.blit(text, (8, r * SQUARE_SIZE - 15))
+        screen.blit(text, (594, r * SQUARE_SIZE - 15))
+        text = font.render(chr(r + 96), True, white)
+        screen.blit(text, (r * SQUARE_SIZE - 13, 590))
+        screen.blit(text, (r * SQUARE_SIZE - 13, 6))
+        r = r - 1
 
 
 if __name__ == '__main__':
