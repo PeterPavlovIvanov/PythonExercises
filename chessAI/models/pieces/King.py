@@ -5,8 +5,165 @@ from models.pieces.Rook import Rook
 
 class King(Piece):
 
+    def is_safe_from_enemy_rook_or_Queen(self, npx, npy, matrix):
+        # up check
+        r = npx - 1
+        c = npy
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Rook' in str(type(cur_piece)) or 'Queen' in str(
+                        type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or rook
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or rook
+                    break  # we consider it valid move depending on queens or rooks
+            r = r - 1
+
+        # down check
+        r = npx + 1
+        c = npy
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Rook' in str(type(cur_piece)) or 'Queen' in str(
+                        type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or rook
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or rook
+                    break  # we consider it valid move depending on queens or rooks
+            r = r + 1
+
+        # left check
+        r = npx
+        c = npy - 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Rook' in str(type(cur_piece)) or 'Queen' in str(type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or rook
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or rook
+                    break  # we consider it valid move depending on queens or rooks
+            c = c - 1
+
+        # right check
+        r = npx
+        c = npy + 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Rook' in str(type(cur_piece)) or 'Queen' in str(type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or rook
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or rook
+                    break  # we consider it valid move depending on queens or rooks
+            c = c + 1
+
+        return True
+
+    def is_safe_from_enemy_bishop_or_Queen(self, npx, npy, matrix):
+        # up left check
+        r = npx - 1
+        c = npy - 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Bishop' in str(type(cur_piece)) or 'Queen' in str(type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or bishop
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or bishop
+                    break  # we consider it valid move depending on queens or bishops
+            r = r - 1
+            c = c - 1
+
+        # down right check
+        r = npx + 1
+        c = npy + 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Bishop' in str(type(cur_piece)) or 'Queen' in str(
+                        type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or bishop
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or bishop
+                    break  # we consider it valid move depending on queens or bishops
+            r = r + 1
+            c = c + 1
+
+        # up right check
+        r = npx - 1
+        c = npy + 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Bishop' in str(type(cur_piece)) or 'Queen' in str(
+                        type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or bishop
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or bishop
+                    break  # we consider it valid move depending on queens or bishops
+            r = r - 1
+            c = c + 1
+
+        # down left check
+        r = npx + 1
+        c = npy - 1
+        while True:
+            if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
+                break
+            cur_piece = matrix[r][c]
+            if cur_piece is not None:  # piece found
+                if ('Bishop' in str(type(cur_piece)) or 'Queen' in str(
+                        type(cur_piece))) and cur_piece.color != self.color:  # if enemy queen or bishop
+                    return False  # it is invalid
+                else:  # if it is not enemy queen or bishop
+                    break  # we consider it valid move depending on queens or bishops
+            r = r + 1
+            c = c - 1
+
+        return True
+
     def is_safe_from_enemy_knights(self, npx, npy, matrix):
-        #if matrix[npx - 2][]
+        if 0 <= npx - 2 < 8 and 0 <= npy - 1 < 8 and matrix[npx - 2][npy - 1] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx - 2][npy - 1])) and matrix[npx - 2][npy - 1].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx - 2 < 8 and 0 <= npy + 1 < 8 and matrix[npx - 2][npy + 1] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx - 2][npy + 1])) and matrix[npx - 2][npy + 1].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx - 1 < 8 and 0 <= npy + 2 < 8 and matrix[npx - 1][npy + 2] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx - 1][npy + 2])) and matrix[npx - 1][npy + 2].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx + 1 < 8 and 0 <= npy + 2 < 8 and matrix[npx + 1][npy + 2] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx + 1][npy + 2])) and matrix[npx + 1][npy + 2].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx + 2 < 8 and 0 <= npy + 1 < 8 and matrix[npx + 2][npy + 1] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx + 2][npy + 1])) and matrix[npx + 2][npy + 1].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx + 2 < 8 and 0 <= npy - 1 < 8 and matrix[npx + 2][npy - 1] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx + 2][npy - 1])) and matrix[npx + 2][npy - 1].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx + 1 < 8 and 0 <= npy - 2 < 8 and matrix[npx + 1][npy - 2] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx + 1][npy - 2])) and matrix[npx + 1][npy - 2].color != self.color:  # and its enemy knight
+                return False
+
+        if 0 <= npx - 1 < 8 and 0 <= npy - 2 < 8 and matrix[npx - 1][npy - 2] is not None:  # found piece on the board
+            if 'Knight' in str(type(matrix[npx - 1][npy - 2])) and matrix[npx - 1][npy - 2].color != self.color:  # and its enemy knight
+                return False
 
         return True
 
@@ -28,42 +185,42 @@ class King(Piece):
         return True
 
     def is_safe_from_enemy_king(self, npx, npy, matrix):
-        if 0 <= npx - 1 < 8 and 0 <= npy - 1 < 8:  # out of board check
+        if 0 <= npx - 1 < 8 and 0 <= npy - 1 < 8:           # out of board check
             if matrix[npx - 1][npy - 1] is not None:        # top left piece found
-                if 'King' and str(type(matrix[npx - 1][npy - 1])) and matrix[npx - 1][npy - 1].color != self.color:  # and it's enemy king
+                if 'King' in str(type(matrix[npx - 1][npy - 1])) and matrix[npx - 1][npy - 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx < 8 and 0 <= npy - 1 < 8:  # out of board check
+        if 0 <= npx < 8 and 0 <= npy - 1 < 8:               # out of board check
             if matrix[npx][npy - 1] is not None:            # top center piece found
                 if 'King' in str(type(matrix[npx][npy - 1])) and matrix[npx][npy - 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx + 1 < 8 and 0 <= npy - 1 < 0:  # out of board check
+        if 0 <= npx + 1 < 8 and 0 <= npy - 1 < 0:           # out of board check
             if matrix[npx + 1][npy - 1] is not None:        # top right piece found
                 if 'King' in str(type(matrix[npx + 1][npy - 1])) and matrix[npx + 1][npy - 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx - 1 < 8 and 0 <= npy < 8:  # out of board check
+        if 0 <= npx - 1 < 8 and 0 <= npy < 8:               # out of board check
             if matrix[npx - 1][npy] is not None:            # center left piece found
                 if 'King' in str(type(matrix[npx - 1][npy])) and matrix[npx - 1][npy].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx + 1 < 8 and 0 <= npy < 8:  # out of board check
+        if 0 <= npx + 1 < 8 and 0 <= npy < 8:               # out of board check
             if matrix[npx + 1][npy] is not None:            # center right piece found
                 if 'King' in str(type(matrix[npx + 1][npy])) and matrix[npx + 1][npy].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx - 1 < 8 and 0 <= npy + 1 < 8:  # out of board check
+        if 0 <= npx - 1 < 8 and 0 <= npy + 1 < 8:           # out of board check
             if matrix[npx - 1][npy + 1] is not None:        # bot left piece found
                 if 'King' in str(type(matrix[npx - 1][npy + 1])) and matrix[npx - 1][npy + 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx < 8 and 0 <= npy + 1 < 8:  # out of board check
+        if 0 <= npx < 8 and 0 <= npy + 1 < 8:               # out of board check
             if matrix[npx][npy + 1] is not None:            # bot center piece found
                 if 'King' in str(type(matrix[npx][npy + 1])) and matrix[npx][npy + 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx + 1 < 8 and 0 <= npy + 1 < 8:  # out of board check
+        if 0 <= npx + 1 < 8 and 0 <= npy + 1 < 8:           # out of board check
             if matrix[npx + 1][npy + 1] is not None:        # bot right piece found
                 if 'King' in str(type(matrix[npx + 1][npy + 1])) and matrix[npx + 1][npy + 1].color != self.color:  # and it's enemy king
                     return False
@@ -82,11 +239,12 @@ class King(Piece):
         if not self.is_safe_from_enemy_knights(npx, npy, matrix):
             return False
 
-        # bishop check
+        if not self.is_safe_from_enemy_bishop_or_Queen(npx, npy, matrix):
+            return False
 
-        # rook check
+        if not self.is_safe_from_enemy_rook_or_Queen(npx, npy, matrix):
+            return False
 
-        # queen check
         return True
 
     def is_valid_move(self, prev_pos, new_pos, matrix):
