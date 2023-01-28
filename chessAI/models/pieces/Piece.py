@@ -200,22 +200,37 @@ class Piece:
             if self.color == 'white':
                 GlobalVariables.w_king_position = new_pos
             else:
-                GlobalVariables.b_king_position = prev_pos
+                GlobalVariables.b_king_position = new_pos
 
         if 'King' not in str(type(self)):  # if we are not moving the King
             if not self.is_safe_from_diagonal_discovered_attack(matrix):  # check for pins
                 matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
                 matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
+                if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
+                    if self.color == 'white':
+                        GlobalVariables.w_king_position = prev_pos
+                    else:
+                        GlobalVariables.b_king_position = prev_pos
                 return False
 
         if 'King' not in str(type(self)):  # if we are not moving the King
             if not self.is_safe_from_direct_discovered_attack(matrix):  # check for pins
                 matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
                 matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
+                if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
+                    if self.color == 'white':
+                        GlobalVariables.w_king_position = prev_pos
+                    else:
+                        GlobalVariables.b_king_position = prev_pos
                 return False
 
         matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
         matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
+        if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
+            if self.color == 'white':
+                GlobalVariables.w_king_position = temp_piece.position
+            else:
+                GlobalVariables.b_king_position = temp_piece.position
         return True
 
     def is_valid_diagonal_move(self, prev_pos, new_pos, matrix):

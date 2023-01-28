@@ -5,10 +5,14 @@ from models.pieces.Rook import Rook
 
 class King(Piece):
 
-    def is_safe_from_enemy_rook_or_Queen(self, npx, npy, matrix):
+    def is_safe_from_enemy_rook_or_Queen(self, prev_pos, npx, npy, matrix):
         # up check
+        ppx = prev_pos[0]
+        ppy = prev_pos[1]
         r = npx - 1
         c = npy
+        if ppx + 1 == npx and ppy == npy:  # start from the next square if we moved in the opposite direction
+            r = r - 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -24,6 +28,8 @@ class King(Piece):
         # down check
         r = npx + 1
         c = npy
+        if ppx - 1 == npx and ppy == npy:  # start from the next square if we moved in the opposite direction
+            r = r + 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -39,6 +45,8 @@ class King(Piece):
         # left check
         r = npx
         c = npy - 1
+        if ppy + 1 == npy and ppx == npx:  # start from the next square if we moved in the opposite direction
+            c = c - 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -53,6 +61,8 @@ class King(Piece):
         # right check
         r = npx
         c = npy + 1
+        if ppy - 1 == npy and ppx == npx:  # start from the next square if we moved in the opposite direction
+            c = c + 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -66,10 +76,19 @@ class King(Piece):
 
         return True
 
-    def is_safe_from_enemy_bishop_or_Queen(self, npx, npy, matrix):
+    def is_safe_from_enemy_bishop_or_Queen(self, prev_pos, npx, npy, matrix):
         # up left check
-        r = npx - 1
-        c = npy - 1
+        ppx = prev_pos[0]
+        ppy = prev_pos[1]
+        r = npx
+        c = npy
+        if ppx + 1 == npx and ppy + 1 == npy:  # if we move down right(the opposite direction)
+            r = r - 2  # start from the next square
+            c = c - 2
+        else:
+            r = r - 1  # else just continue
+            c = c - 1
+
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -83,8 +102,14 @@ class King(Piece):
             c = c - 1
 
         # down right check
-        r = npx + 1
-        c = npy + 1
+        r = npx
+        c = npy
+        if ppx - 1 == npx and ppy - 1 == npy:  # if we move up left(the opposite direction)
+            r = r + 2  # start from the next square
+            c = c + 2
+        else:
+            r = r + 1  # else just continue
+            c = c + 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -99,8 +124,14 @@ class King(Piece):
             c = c + 1
 
         # up right check
-        r = npx - 1
-        c = npy + 1
+        r = npx
+        c = npy
+        if ppx + 1 == npx and ppy - 1 == npy:  # if we move down left(the opposite direction)
+            r = r - 2  # start from the next square
+            c = c + 2
+        else:
+            r = r - 1  # else just continue
+            c = c + 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -115,8 +146,14 @@ class King(Piece):
             c = c + 1
 
         # down left check
-        r = npx + 1
-        c = npy - 1
+        r = npx
+        c = npy
+        if ppx - 1 == npx and ppy + 1 == npy:  # if we move up right(the opposite direction)
+            r = r + 2  # start from the next square
+            c = c - 2
+        else:
+            r = r + 1  # else just continue
+            c = c - 1
         while True:
             if r < 0 or r > 7 or c < 0 or c > 7:  # out of board = end of loop
                 break
@@ -227,7 +264,7 @@ class King(Piece):
 
         return True
 
-    def is_going_into_free_square(self, new_pos, matrix):
+    def is_going_into_free_square(self, prev_pos, new_pos, matrix):
         npx = new_pos[0]
         npy = new_pos[1]
         if not self.is_safe_from_enemy_king(npx, npy, matrix):
@@ -239,10 +276,10 @@ class King(Piece):
         if not self.is_safe_from_enemy_knights(npx, npy, matrix):
             return False
 
-        if not self.is_safe_from_enemy_bishop_or_Queen(npx, npy, matrix):
+        if not self.is_safe_from_enemy_bishop_or_Queen(prev_pos, npx, npy, matrix):
             return False
 
-        if not self.is_safe_from_enemy_rook_or_Queen(npx, npy, matrix):
+        if not self.is_safe_from_enemy_rook_or_Queen(prev_pos, npx, npy, matrix):
             return False
 
         return True
@@ -251,7 +288,7 @@ class King(Piece):
         if not Piece.is_valid_move(self, prev_pos, new_pos, matrix):
             return False
 
-        if not self.is_going_into_free_square(new_pos, matrix):
+        if not self.is_going_into_free_square(prev_pos, new_pos, matrix):
             return False
 
         ppx = prev_pos[0]
@@ -278,8 +315,8 @@ class King(Piece):
 
         if not self.moved:  # if we haven't moved the king and we try to castle
             if ppy + 2 == npy and ppx == npx:  # we try to castle king side
-                if not self.is_going_into_free_square((ppx, ppy + 1), matrix) \
-                        or not self.is_going_into_free_square((ppx, ppy + 2), matrix):  # king's way is attacked
+                if not self.is_going_into_free_square(prev_pos, (ppx, ppy + 1), matrix) \
+                        or not self.is_going_into_free_square(prev_pos, (ppx, ppy + 2), matrix):  # king's way is attacked
                     return False
                 if matrix[ppx][ppy + 1] is None and matrix[ppx][ppy + 2] is None:  # square on the right of the king are empty
                     if self.color == 'white':  # white king castle
@@ -305,8 +342,8 @@ class King(Piece):
                                     GlobalVariables.b_king_position = new_pos
                                 return True
             elif ppy - 2 == npy and ppx == npx:  # we try to castle queen side
-                if not self.is_going_into_free_square((ppx, ppy - 1), matrix) \
-                        or not self.is_going_into_free_square((ppx, ppy - 2), matrix):  # king's way is attacked
+                if not self.is_going_into_free_square(prev_pos, (ppx, ppy - 1), matrix) \
+                        or not self.is_going_into_free_square(prev_pos, (ppx, ppy - 2), matrix):  # king's way is attacked
                     return False
                 if matrix[ppx][ppy - 1] is None and matrix[ppx][ppy - 2] is None:  # square on the right of the king are empty
                     if self.color == 'white':  # white king castle
