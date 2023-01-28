@@ -94,7 +94,7 @@ class Piece:
 
         return True
 
-    def is_safe_from_diagonal_discovered_attack_color(self, matrix, color1, color2):
+    def is_safe_from_diagonal_discovered_attack_color(self, matrix, color1):
         if self.color == color1:  # check white king safety
             # save the beginning of the counters
             start_r_counter = GlobalVariables.w_king_position[0] if color1 == 'white' \
@@ -112,9 +112,9 @@ class Piece:
                     break  # we leave
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
-                    if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == color2:  # and is attack our king
-                            return False  # it's invalid move
+                    if ('Bishop' in piece_full_type or 'Queen' in piece_full_type) \
+                            and matrix[r][c].color != color1:  # and is attack our king a.k.a its different color
+                        return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
@@ -128,9 +128,9 @@ class Piece:
                     break  # we leave
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
-                    if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == color2:  # and is attack our king
-                            return False  # it's invalid move
+                    if ('Bishop' in piece_full_type or 'Queen' in piece_full_type) \
+                            and matrix[r][c].color != color1:  # and is attack our king a.k.a its different color
+                        return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
@@ -144,9 +144,9 @@ class Piece:
                     break  # we leave
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
-                    if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == color2:  # and is attack our king
-                            return False  # it's invalid move
+                    if ('Bishop' in piece_full_type or 'Queen' in piece_full_type) \
+                            and matrix[r][c].color != color1:  # and is attack our king a.k.a its different color
+                        return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
@@ -160,9 +160,9 @@ class Piece:
                     break  # we leave
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
-                    if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == color2:  # and is attack our king
-                            return False  # it's invalid move
+                    if ('Bishop' in piece_full_type or 'Queen' in piece_full_type) \
+                            and matrix[r][c].color != color1:  # and is attack our king a.k.a its different color
+                        return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
@@ -170,9 +170,9 @@ class Piece:
 
     def is_safe_from_diagonal_discovered_attack(self, matrix):
         if GlobalVariables.turn:  # if it's white's turn
-            if not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'white', 'black'):  # we check white's king safety
+            if not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'white'):  # we check white's king safety
                 return False
-        elif not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'black', 'white'):  # on black's turn we check black kings safety
+        elif not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'black'):  # on black's turn we check black kings safety
             return False
 
         return True
