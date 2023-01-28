@@ -10,6 +10,7 @@ class Piece:
         self.position = position
         self.image = pygame.image.load(image)
         self.moved = False
+        self.dj = False  # did the pawn double jump, the last turn
 
     def new_position(self, pos):
         self.position = pos
@@ -83,8 +84,16 @@ class Piece:
         return True
 
     def is_valid_move(self, prev_pos, new_pos, matrix):
-        if prev_pos == new_pos:
+        if prev_pos[0] > 7 or prev_pos[0] < 0 or prev_pos[1] > 7 \
+                or prev_pos[1] < 0 or new_pos[0] > 7 or new_pos[0] < 0 or new_pos[1] > 7 or new_pos[1] < 0:
+            return False  # return false when trying to leave the board
+
+        if prev_pos == new_pos:  # if we move the piece at the same spot it is not considered a move
             return False
+
+        if matrix[new_pos[0]][new_pos[1]] is not None:  # if we are trying to capture a piece
+            if matrix[new_pos[0]][new_pos[1]].color == self.color:  # it cannot be ours
+                return False
 
         #if not self.is_safe_from_diagonal_discovered_attack(matrix):
         #    return False
