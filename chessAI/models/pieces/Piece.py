@@ -10,7 +10,6 @@ class Piece:
         self.position = position
         self.image = pygame.image.load(image)
         self.moved = False
-        self.dj = False  # did the pawn double jump, the last turn
 
     def new_position(self, pos):
         self.position = pos
@@ -95,7 +94,8 @@ class Piece:
             if matrix[new_pos[0]][new_pos[1]].color == self.color:  # it cannot be ours
                 return False
 
-        #if not self.is_safe_from_diagonal_discovered_attack(matrix):
+        # todo: discovered attacks
+        # if not self.is_safe_from_diagonal_discovered_attack(matrix):
         #    return False
 
         return True

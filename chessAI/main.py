@@ -1,11 +1,15 @@
+import copy
+
 import pygame
 
+import GlobalVariables
 from GlobalVariables import *
 from models.Board import Board
 from models.pieces.Bishop import Bishop
 from models.pieces.King import King
 from models.pieces.Knight import Knight
 from models.pieces.Pawn import Pawn
+from models.pieces.Piece import Piece
 from models.pieces.Queen import Queen
 from models.pieces.Rook import Rook
 
@@ -73,11 +77,14 @@ def main():
                 prev_square_y = square_y  # previous position
                 square_y = int(cur_x / SQUARE_SIZE)  # take new square position for the piece
                 square_x = int(cur_y / SQUARE_SIZE)  # take new square position for the piece
+
                 if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y), board.matrix):
-                    board.matrix[prev_square_x][prev_square_y] = None
+                    #board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
+                    GlobalVariables.history.append(copy.copy(selected_piece))  # save the prev pos of the piece
                     selected_piece.new_position((square_x, square_y))  # prepare new piece position
                     board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
-                    turn = not turn
+                    GlobalVariables.history.append(selected_piece)  # add the new state of the piece
+                    turn = not turn  # change turns
                 else:  # if the move is illegal
                     board.matrix[prev_square_x][prev_square_y] = prev_piece
                     square_x = prev_square_x  # retrieve previous position

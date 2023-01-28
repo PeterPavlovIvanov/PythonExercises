@@ -8,3 +8,4 @@ BACKGROUND_COLOR = (128, 89, 0)
 
 w_king_position = (7, 4)
 b_king_position = (0, 4)
+history = []  # each element of the history contains 2 Pieces, the old and the new state of the piece
