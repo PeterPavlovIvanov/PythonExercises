@@ -278,8 +278,10 @@ class King(Piece):
 
         if not self.moved:  # if we haven't moved the king and we try to castle
             if ppy + 2 == npy and ppx == npx:  # we try to castle king side
-                if matrix[ppx][ppy + 1] is None and matrix[ppx][
-                    ppy + 2] is None:  # square on the right of the king are empty
+                if not self.is_going_into_free_square((ppx, ppy + 1), matrix) \
+                        or not self.is_going_into_free_square((ppx, ppy + 2), matrix):  # king's way is attacked
+                    return False
+                if matrix[ppx][ppy + 1] is None and matrix[ppx][ppy + 2] is None:  # square on the right of the king are empty
                     if self.color == 'white':  # white king castle
                         if isinstance(matrix[7][7], Rook):  # we have a piece on the right that is a rook
                             if not matrix[7][7].moved:  # if the rook hasn't moved
@@ -303,8 +305,10 @@ class King(Piece):
                                     GlobalVariables.b_king_position = new_pos
                                 return True
             elif ppy - 2 == npy and ppx == npx:  # we try to castle queen side
-                if matrix[ppx][ppy - 1] is None and matrix[ppx][
-                    ppy - 2] is None:  # square on the right of the king are empty
+                if not self.is_going_into_free_square((ppx, ppy - 1), matrix) \
+                        or not self.is_going_into_free_square((ppx, ppy - 2), matrix):  # king's way is attacked
+                    return False
+                if matrix[ppx][ppy - 1] is None and matrix[ppx][ppy - 2] is None:  # square on the right of the king are empty
                     if self.color == 'white':  # white king castle
                         if isinstance(matrix[7][0], Rook):  # we have a piece on the right that is a rook
                             if not matrix[7][0].moved:  # if the rook hasn't moved
