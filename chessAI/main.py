@@ -42,7 +42,6 @@ def main():
     square_x = -1
     prev_square_x = -1
     prev_square_y = -1
-    turn = True
     prev_piece = None
     while True:
         cur_pos = pygame.mouse.get_pos()
@@ -56,7 +55,7 @@ def main():
                 square_y = int(cur_x / SQUARE_SIZE)
                 square_x = int(cur_y / SQUARE_SIZE)
                 selected_piece = board.matrix[square_x][square_y]  # duplicates the piece from the board in the hand
-                if turn:
+                if GlobalVariables.turn:
                     if selected_piece is not None:
                         if selected_piece.color == 'white':
                             prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
@@ -79,12 +78,12 @@ def main():
                 square_x = int(cur_y / SQUARE_SIZE)  # take new square position for the piece
 
                 if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y), board.matrix):
-                    #board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
+                    board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
                     GlobalVariables.history.append(copy.copy(selected_piece))  # save the prev pos of the piece
                     selected_piece.new_position((square_x, square_y))  # prepare new piece position
                     board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
                     GlobalVariables.history.append(selected_piece)  # add the new state of the piece
-                    turn = not turn  # change turns
+                    GlobalVariables.turn = not GlobalVariables.turn  # change turns
                 else:  # if the move is illegal
                     board.matrix[prev_square_x][prev_square_y] = prev_piece
                     square_x = prev_square_x  # retrieve previous position

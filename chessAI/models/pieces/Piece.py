@@ -86,9 +86,10 @@ class Piece:
         return True
 
     def is_safe_from_direct_discovered_attack(self, matrix):
-        if not self.is_safe_from_direct_discovered_attack_color(matrix, 'white', 'black'):
-            return False
-        elif not self.is_safe_from_direct_discovered_attack_color(matrix, 'black', 'white'):
+        if GlobalVariables.turn:  # if it's white's turn
+            if not self.is_safe_from_direct_discovered_attack_color(matrix, 'white', 'black'):  # we check white's king safety
+                return False
+        elif not self.is_safe_from_direct_discovered_attack_color(matrix, 'black', 'white'):  # on black's turn we check black kings safety
             return False
 
         return True
@@ -168,9 +169,10 @@ class Piece:
         return True
 
     def is_safe_from_diagonal_discovered_attack(self, matrix):
-        if not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'white', 'black'):
-            return False
-        elif not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'black', 'white'):
+        if GlobalVariables.turn:  # if it's white's turn
+            if not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'white', 'black'):  # we check white's king safety
+                return False
+        elif not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'black', 'white'):  # on black's turn we check black kings safety
             return False
 
         return True
@@ -187,16 +189,33 @@ class Piece:
             if matrix[new_pos[0]][new_pos[1]].color == self.color:  # it cannot be ours
                 return False
 
-        # todo: first place the piece the move, in the cases where we block an attack to the king with another piece
+        # Temporary set the self on the new_pos
+        temp_piece = copy.copy(self)
+        temp_piece.position = new_pos
+        matrix[prev_pos[0]][prev_pos[1]] = None
+        temp_prev_piece_on_new_position = copy.copy(matrix[new_pos[0]][new_pos[1]])
+        matrix[new_pos[0]][new_pos[1]] = temp_piece
+        # and update the global position if we move a king
+        if 'King' in str(type(self)):
+            if self.color == 'white':
+                GlobalVariables.w_king_position = new_pos
+            else:
+                GlobalVariables.b_king_position = prev_pos
+
         if 'King' not in str(type(self)):  # if we are not moving the King
             if not self.is_safe_from_diagonal_discovered_attack(matrix):  # check for pins
+                matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
+                matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
                 return False
 
-        # todo: first place the piece the move, in the cases where we block an attack to the king with another piece
         if 'King' not in str(type(self)):  # if we are not moving the King
             if not self.is_safe_from_direct_discovered_attack(matrix):  # check for pins
+                matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
+                matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
                 return False
 
+        matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
+        matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
         return True
 
     def is_valid_diagonal_move(self, prev_pos, new_pos, matrix):
