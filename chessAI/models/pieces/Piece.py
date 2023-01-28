@@ -1,3 +1,5 @@
+import copy
+
 import pygame
 
 import GlobalVariables
@@ -14,10 +16,93 @@ class Piece:
     def new_position(self, pos):
         self.position = pos
 
-    def is_safe_from_diagonal_discovered_attack(self, matrix):
-        if self.color == 'white':  # check white king safety
-            r = GlobalVariables.w_king_position[0]  # row counter
-            c = GlobalVariables.w_king_position[1]  # col counter
+    def is_safe_from_direct_discovered_attack_color(self, matrix, color1, color2):
+        # save the beginning of the counters
+        start_r_counter = GlobalVariables.w_king_position[0] if color1 == 'white' \
+            else GlobalVariables.b_king_position[0]
+        start_c_counter = GlobalVariables.w_king_position[1] if color1 == 'white' \
+            else GlobalVariables.b_king_position[1]
+
+        # up check
+        r = copy.copy(start_r_counter)  # reinit counter
+        c = copy.copy(start_c_counter)  # reinit counter
+        while True:
+            r = r - 1
+            if r > 7 or r < 0 or c > 7 or c < 0:  # out of board check
+                break
+            piece_found = matrix[r][c]
+            if piece_found is not None:  # on first found piece
+                if ('Rook' in str(type(piece_found)) or 'Queen' in str(type(piece_found)))\
+                        and piece_found.color == color2:  # enemy rook or queen found as first piece
+                    return False  # illegal move
+                else:
+                    break
+
+        # down check
+        r = copy.copy(start_r_counter)  # reinit counter
+        c = copy.copy(start_c_counter)  # reinit counter
+        while True:
+            r = r + 1
+            if r > 7 or r < 0 or c > 7 or c < 0:  # out of board check
+                break
+            piece_found = matrix[r][c]
+            if piece_found is not None:  # on first found piece
+                if ('Rook' in str(type(piece_found)) or 'Queen' in str(type(piece_found)))\
+                        and piece_found.color == color2:  # enemy rook or queen found as first piece
+                    return False  # illegal move
+                else:
+                    break
+
+        # left check
+        r = copy.copy(start_r_counter)  # reinit counter
+        c = copy.copy(start_c_counter)  # reinit counter
+        while True:
+            c = c - 1
+            if r > 7 or r < 0 or c > 7 or c < 0:  # out of board check
+                break
+            piece_found = matrix[r][c]
+            if piece_found is not None:  # on first found piece
+                if ('Rook' in str(type(piece_found)) or 'Queen' in str(type(piece_found)))\
+                        and piece_found.color == color2:  # enemy rook or queen found as first piece
+                    return False  # illegal move
+                else:
+                    break
+
+        # right check
+        r = copy.copy(start_r_counter)  # reinit counter
+        c = copy.copy(start_c_counter)  # reinit counter
+        while True:
+            c = c + 1
+            if r > 7 or r < 0 or c > 7 or c < 0:  # out of board check
+                break
+            piece_found = matrix[r][c]
+            if piece_found is not None:  # on first found piece
+                if ('Rook' in str(type(piece_found)) or 'Queen' in str(type(piece_found)))\
+                        and piece_found.color == color2:  # enemy rook or queen found as first piece
+                    return False  # illegal move
+                else:
+                    break
+
+        return True
+
+    def is_safe_from_direct_discovered_attack(self, matrix):
+        if not self.is_safe_from_direct_discovered_attack_color(matrix, 'white', 'black'):
+            return False
+        elif not self.is_safe_from_direct_discovered_attack_color(matrix, 'black', 'white'):
+            return False
+
+        return True
+
+    def is_safe_from_diagonal_discovered_attack_color(self, matrix, color1, color2):
+        if self.color == color1:  # check white king safety
+            # save the beginning of the counters
+            start_r_counter = GlobalVariables.w_king_position[0] if color1 == 'white' \
+                else GlobalVariables.b_king_position[0]
+            start_c_counter = GlobalVariables.w_king_position[1] if color1 == 'white' \
+                else GlobalVariables.b_king_position[1]
+
+            r = copy.copy(start_r_counter)  # row counter
+            c = copy.copy(start_c_counter)  # col counter
             # down right check
             while True:
                 r = r + 1
@@ -27,13 +112,13 @@ class Piece:
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
                     if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == 'black':  # and is attack our king
+                        if matrix[r][c].color == color2:  # and is attack our king
                             return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
-            r = GlobalVariables.w_king_position[0]  # reset row counter
-            c = GlobalVariables.w_king_position[1]  # reset col counter
+            r = copy.copy(start_r_counter)  # row counter
+            c = copy.copy(start_c_counter)  # col counter
             # up left check
             while True:
                 r = r - 1
@@ -43,13 +128,13 @@ class Piece:
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
                     if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == 'black':  # and is attack our king
+                        if matrix[r][c].color == color2:  # and is attack our king
                             return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
-            r = GlobalVariables.w_king_position[0]  # reset row counter
-            c = GlobalVariables.w_king_position[1]  # reset col counter
+            r = copy.copy(start_r_counter)  # row counter
+            c = copy.copy(start_c_counter)  # col counter
             # up right check
             while True:
                 r = r - 1
@@ -59,13 +144,13 @@ class Piece:
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
                     if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == 'black':  # and is attack our king
+                        if matrix[r][c].color == color2:  # and is attack our king
                             return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
 
-            r = GlobalVariables.w_king_position[0]  # reset row counter
-            c = GlobalVariables.w_king_position[1]  # reset col counter
+            r = copy.copy(start_r_counter)  # row counter
+            c = copy.copy(start_c_counter)  # col counter
             # down left check
             while True:
                 r = r + 1
@@ -75,10 +160,18 @@ class Piece:
                 if matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(matrix[r][c]))
                     if 'Bishop' in piece_full_type or 'Queen' in piece_full_type:  # if we meet a queen or a bishop
-                        if matrix[r][c].color == 'black':  # and is attack our king
+                        if matrix[r][c].color == color2:  # and is attack our king
                             return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king
+
+        return True
+
+    def is_safe_from_diagonal_discovered_attack(self, matrix):
+        if not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'white', 'black'):
+            return False
+        elif not self.is_safe_from_diagonal_discovered_attack_color(matrix, 'black', 'white'):
+            return False
 
         return True
 
@@ -94,9 +187,15 @@ class Piece:
             if matrix[new_pos[0]][new_pos[1]].color == self.color:  # it cannot be ours
                 return False
 
-        # todo: discovered attacks
-        # if not self.is_safe_from_diagonal_discovered_attack(matrix):
-        #    return False
+        # todo: first place the piece the move, in the cases where we block an attack to the king with another piece
+        if 'King' not in str(type(self)):  # if we are not moving the King
+            if not self.is_safe_from_diagonal_discovered_attack(matrix):  # check for pins
+                return False
+
+        # todo: first place the piece the move, in the cases where we block an attack to the king with another piece
+        if 'King' not in str(type(self)):  # if we are not moving the King
+            if not self.is_safe_from_direct_discovered_attack(matrix):  # check for pins
+                return False
 
         return True
 
@@ -166,7 +265,6 @@ class Piece:
                 break  # and in either way we break
 
         return new_pos in valid_moves
-
 
     def is_valid_direct_move(self, prev_pos, new_pos, matrix):
         ppx = prev_pos[0]
