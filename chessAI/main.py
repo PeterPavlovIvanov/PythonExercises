@@ -14,6 +14,8 @@ from models.pieces.Queen import Queen
 from models.pieces.Rook import Rook
 
 white = (255, 255, 255)
+selected_square = pygame.image.load('res/possible_movement_7.png')
+
 
 def create_board_surface():
     board_surface = pygame.Surface((SQUARE_SIZE * ROWS, SQUARE_SIZE * COLS))
@@ -95,6 +97,15 @@ def main():
         draw_letters_on_side(screen)
         screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
         board.draw_board(screen)
+
+        # select just moved squares
+        if len(GlobalVariables.history) > 1:  # if there is a move made
+            new_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 1]  # latest pos of moved piece
+            old_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 2]  # old pos of moved piece
+            screen.blit(selected_square, (old_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+                                          , old_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
+            screen.blit(selected_square, (new_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+                                          , new_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
 
         # always enter dragging but only when selected_piece is not None we act inside
         # selected_piece will become not None when left button is pressed, when released it is again set to None
