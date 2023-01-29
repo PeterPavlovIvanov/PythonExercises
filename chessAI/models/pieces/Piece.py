@@ -228,9 +228,9 @@ class Piece:
         matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
         if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
             if self.color == 'white':
-                GlobalVariables.w_king_position = temp_piece.position
+                GlobalVariables.w_king_position = prev_pos
             else:
-                GlobalVariables.b_king_position = temp_piece.position
+                GlobalVariables.b_king_position = prev_pos
         return True
 
     def is_valid_diagonal_move(self, prev_pos, new_pos, matrix):
