@@ -99,13 +99,7 @@ def main():
         board.draw_board(screen)
 
         # select just moved squares
-        if len(GlobalVariables.history) > 1:  # if there is a move made
-            new_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 1]  # latest pos of moved piece
-            old_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 2]  # old pos of moved piece
-            screen.blit(selected_square, (old_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
-                                          , old_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
-            screen.blit(selected_square, (new_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
-                                          , new_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
+        draw_selected_squares(screen)
 
         # always enter dragging but only when selected_piece is not None we act inside
         # selected_piece will become not None when left button is pressed, when released it is again set to None
@@ -117,6 +111,16 @@ def main():
 
 
 pygame.font.init()
+
+
+def draw_selected_squares(screen):
+    if len(GlobalVariables.history) > 1:  # if there is a move made
+        new_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 1]  # latest pos of moved piece
+        old_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 2]  # old pos of moved piece
+        screen.blit(selected_square, (old_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+                                      , old_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
+        screen.blit(selected_square, (new_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+                                      , new_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
 
 
 def draw_letters_on_side(screen):

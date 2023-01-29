@@ -228,32 +228,32 @@ class King(Piece):
                     return False
 
         if 0 <= npx < 8 and 0 <= npy - 1 < 8:               # out of board check
-            if matrix[npx][npy - 1] is not None:            # top center piece found
+            if matrix[npx][npy - 1] is not None:            # left center piece found
                 if 'King' in str(type(matrix[npx][npy - 1])) and matrix[npx][npy - 1].color != self.color:  # and it's enemy king
                     return False
 
-        if 0 <= npx + 1 < 8 and 0 <= npy - 1 < 0:           # out of board check
-            if matrix[npx + 1][npy - 1] is not None:        # top right piece found
+        if 0 <= npx + 1 < 8 and 0 <= npy - 1 < 8:           # out of board check
+            if matrix[npx + 1][npy - 1] is not None:        # bot left piece found
                 if 'King' in str(type(matrix[npx + 1][npy - 1])) and matrix[npx + 1][npy - 1].color != self.color:  # and it's enemy king
                     return False
 
         if 0 <= npx - 1 < 8 and 0 <= npy < 8:               # out of board check
-            if matrix[npx - 1][npy] is not None:            # center left piece found
+            if matrix[npx - 1][npy] is not None:            # top center piece found
                 if 'King' in str(type(matrix[npx - 1][npy])) and matrix[npx - 1][npy].color != self.color:  # and it's enemy king
                     return False
 
         if 0 <= npx + 1 < 8 and 0 <= npy < 8:               # out of board check
-            if matrix[npx + 1][npy] is not None:            # center right piece found
+            if matrix[npx + 1][npy] is not None:            # bot center piece found
                 if 'King' in str(type(matrix[npx + 1][npy])) and matrix[npx + 1][npy].color != self.color:  # and it's enemy king
                     return False
 
         if 0 <= npx - 1 < 8 and 0 <= npy + 1 < 8:           # out of board check
-            if matrix[npx - 1][npy + 1] is not None:        # bot left piece found
+            if matrix[npx - 1][npy + 1] is not None:        # top right piece found
                 if 'King' in str(type(matrix[npx - 1][npy + 1])) and matrix[npx - 1][npy + 1].color != self.color:  # and it's enemy king
                     return False
 
         if 0 <= npx < 8 and 0 <= npy + 1 < 8:               # out of board check
-            if matrix[npx][npy + 1] is not None:            # bot center piece found
+            if matrix[npx][npy + 1] is not None:            # center right piece found
                 if 'King' in str(type(matrix[npx][npy + 1])) and matrix[npx][npy + 1].color != self.color:  # and it's enemy king
                     return False
 
