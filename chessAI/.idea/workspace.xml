@@ -4,9 +4,6 @@
     <list default="true" id="52ce80e3-7e25-44ca-afd4-901bca876ba5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/../ReverseAddPalindrome/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ReverseAddPalindrome/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/GlobalVariables.py" beforeDir="false" afterPath="$PROJECT_DIR$/GlobalVariables.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/pieces/King.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/pieces/King.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/pieces/Piece.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/pieces/Piece.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -94,15 +91,6 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/models/pieces/King.py</url>
-          <line>224</line>
-          <option name="timeStamp" value="47" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="matrix" />

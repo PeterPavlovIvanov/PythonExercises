@@ -85,6 +85,36 @@ class Piece:
 
         return True
 
+    def is_safe_from_pawns_color(self, matrix, color1, color2):
+        king_pos = GlobalVariables.w_king_position if color1 == 'white' else GlobalVariables.b_king_position
+        kpx = king_pos[0]
+        kpy = king_pos[1]
+        direction = -1 if color1 == 'white' else 1
+
+        # pawn ot the left
+        if -1 < kpx + direction < 8 and -1 < kpy - 1 < 8:  # in the board
+            if matrix[kpx + direction][kpy - 1] is not None:  # there is a piece
+                if 'Pawn' in str(type(matrix[kpx + direction][kpy - 1])) and matrix[kpx + direction][kpy - 1].color == color2:  # enemy pawn found
+                    return False
+
+        # pawn on the right
+        if -1 < kpx + direction < 8 and -1 < kpy + 1 < 8:  # in the board
+            if matrix[kpx + direction][kpy + 1] is not None:  # there is a piece
+                if 'Pawn' in str(type(matrix[kpx + direction][kpy + 1])) and matrix[kpx + direction][kpy + 1].color == color2:  # enemy pawn found
+                    return False
+
+        return True
+
+    def is_safe_from_pawns(self, matrix):
+        if GlobalVariables.turn:  # if it's white's turn
+            if not self.is_safe_from_pawns_color(matrix, 'white', 'black'):  # we check white's king safety
+                return False
+        else:
+            if not self.is_safe_from_pawns_color(matrix, 'black', 'white'):  # on black's turn we check black kings safety
+                return False
+
+        return True
+
     def is_safe_from_knights_color(self, matrix, color1, color2):
         king_pos = GlobalVariables.w_king_position if color1 == 'white' else GlobalVariables.b_king_position
         kpx = king_pos[0]
@@ -134,6 +164,7 @@ class Piece:
                     return False
 
         return True
+
 
     def is_safe_from_knights(self, matrix):
         if GlobalVariables.turn:  # if it's white's turn
@@ -286,6 +317,17 @@ class Piece:
 
         if 'King' not in str(type(self)):  # if we are not moving the King
             if not self.is_safe_from_knights(matrix):  # check for attacks from knights
+                matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
+                matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
+                if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
+                    if self.color == 'white':
+                        GlobalVariables.w_king_position = prev_pos
+                    else:
+                        GlobalVariables.b_king_position = prev_pos
+                return False
+
+        if 'King' not in str(type(self)):  # if we are not moving the King
+            if not self.is_safe_from_pawns(matrix):  # check for attacks from pawns
                 matrix[prev_pos[0]][prev_pos[1]] = copy.copy(temp_piece)  # rollback piece in hand
                 matrix[new_pos[0]][new_pos[1]] = temp_prev_piece_on_new_position  # rollback piece or None on the new square
                 if 'King' in str(type(self)):  # rollback global kings positions if king is grabbed
