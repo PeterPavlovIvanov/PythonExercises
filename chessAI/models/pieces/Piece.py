@@ -12,6 +12,7 @@ class Piece:
         self.position = position
         self.image = pygame.image.load(image)
         self.moved = False
+        self.value = 0
 
     def new_position(self, pos):
         self.position = pos

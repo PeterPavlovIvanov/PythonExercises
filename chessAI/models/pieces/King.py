@@ -4,6 +4,9 @@ from models.pieces.Rook import Rook
 
 
 class King(Piece):
+    def __init__(self, prev_pos, new_pos, matrix):
+        Piece.__init__(self, prev_pos, new_pos, matrix)
+        self.value = 100
 
     def is_safe_from_enemy_rook_or_Queen(self, prev_pos, npx, npy, matrix):
         # up check
