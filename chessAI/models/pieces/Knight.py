@@ -2,12 +2,12 @@ from models.pieces.Piece import Piece
 
 
 class Knight(Piece):
-    def __init__(self, prev_pos, new_pos, matrix):
-        Piece.__init__(self, prev_pos, new_pos, matrix)
+    def __init__(self, color, new_pos, image):
+        Piece.__init__(self, color, new_pos, image)
         self.value = 300
 
-    def is_valid_move(self, prev_pos, new_pos, matrix):
-        if not Piece.is_valid_move(self, prev_pos, new_pos, matrix):
+    def is_valid_move(self, prev_pos, new_pos):
+        if not Piece.is_valid_move(self, prev_pos, new_pos):
             return False
 
         ppx = prev_pos[0]

@@ -30,17 +30,17 @@ def create_board_surface():
     return board_surface
 
 
-def drag_piece(screen, selected_piece, drag_pos, matrix):
+def drag_piece(selected_piece, drag_pos):
     if selected_piece is not None:
-        screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
+        GlobalVariables.screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
 
 
 def main():
-    screen = pygame.display.set_mode((630, 610))
-    board = Board()
+    GlobalVariables.screen = pygame.display.set_mode((630, 610))
+    GlobalVariables.board = Board()
     board_surface = create_board_surface()
-    count_evaluation(board.matrix)  # count initial evaluation
-    draw_evaluation(screen)  # draw evaluation
+    count_evaluation()  # count initial evaluation
+    draw_evaluation()  # draw evaluation
     clock = pygame.time.Clock()
     selected_piece = None
     square_y = -1
@@ -59,19 +59,19 @@ def main():
             elif e.type == pygame.MOUSEBUTTONDOWN:  # left click --> grab a piece in hand
                 square_y = int(cur_x / SQUARE_SIZE)
                 square_x = int(cur_y / SQUARE_SIZE)
-                selected_piece = board.matrix[square_x][square_y]  # duplicates the piece from the board in the hand
+                selected_piece = GlobalVariables.board.matrix[square_x][square_y]  # duplicates the piece from the board in the hand
                 if GlobalVariables.turn:
                     if selected_piece is not None:
                         if selected_piece.color == 'white':
-                            prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
-                            board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
+                            prev_piece = GlobalVariables.board.matrix[square_x][square_y]  # saves the previous/current state of the piece
+                            GlobalVariables.board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
                         else:
                             selected_piece = None
                 else:
                     if selected_piece is not None:
                         if selected_piece.color == 'black':
-                            prev_piece = board.matrix[square_x][square_y]  # saves the previous/current state of the piece
-                            board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
+                            prev_piece = GlobalVariables.board.matrix[square_x][square_y]  # saves the previous/current state of the piece
+                            GlobalVariables.board.matrix[square_x][square_y] = None  # removes it that so it is only in our hand
                         else:
                             selected_piece = None
             elif e.type == pygame.MOUSEBUTTONUP:  # release left click --> drop piece back on the board
@@ -82,35 +82,39 @@ def main():
                 square_y = int(cur_x / SQUARE_SIZE)  # take new square position for the piece
                 square_x = int(cur_y / SQUARE_SIZE)  # take new square position for the piece
 
-                if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y), board.matrix):
-                    board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
+                if selected_piece.is_valid_move((prev_square_x, prev_square_y), (square_x, square_y)):
+                    GlobalVariables.board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
                     GlobalVariables.history.append(copy.copy(selected_piece))  # save the prev pos of the piece
                     selected_piece.new_position((square_x, square_y))  # prepare new piece position
-                    board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+
+                    if GlobalVariables.board.matrix[square_x][square_y] is not None:
+                        if GlobalVariables.board.matrix[square_x][square_y].color != selected_piece.color:
+                            GlobalVariables.board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+                    else:
+                        GlobalVariables.board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+
                     GlobalVariables.history.append(selected_piece)  # add the new state of the piece
-                    count_evaluation(board.matrix)  # count evaluation
-                    print(GlobalVariables.b_team_value)
-                    print(GlobalVariables.w_team_value)
+                    count_evaluation()  # count evaluation
                     GlobalVariables.turn = not GlobalVariables.turn  # change turns
                 else:  # if the move is illegal
-                    board.matrix[prev_square_x][prev_square_y] = prev_piece
+                    GlobalVariables.board.matrix[prev_square_x][prev_square_y] = prev_piece
                     square_x = prev_square_x  # retrieve previous position
                     square_y = prev_square_y  # retrieve previous position
 
                 selected_piece = None  # Remove piece from hand
 
-        screen.fill(BACKGROUND_COLOR)
-        draw_letters_on_side(screen)
-        screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
-        board.draw_board(screen)
+        GlobalVariables.screen.fill(BACKGROUND_COLOR)
+        draw_letters_on_side()
+        GlobalVariables.screen.blit(board_surface, (BOARD_ADJUSTMENT, BOARD_ADJUSTMENT))
+        GlobalVariables.board.draw_board()
 
         # select just moved squares
-        draw_selected_squares(screen)
-        draw_evaluation(screen)  # draw evaluation
+        draw_selected_squares()
+        draw_evaluation()  # draw eva-luation
 
         # always enter dragging but only when selected_piece is not None we act inside
         # selected_piece will become not None when left button is pressed, when released it is again set to None
-        drag_piece(screen, selected_piece, (cur_x, cur_y), board.matrix)
+        drag_piece(selected_piece, (cur_x, cur_y))
 
         # display update
         pygame.display.flip()
@@ -121,46 +125,46 @@ def main():
 pygame.font.init()
 
 
-def draw_selected_squares(screen):
+def draw_selected_squares():
     if len(GlobalVariables.history) > 1:  # if there is a move made
         new_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 1]  # latest pos of moved piece
         old_square_to_select = GlobalVariables.history[len(GlobalVariables.history) - 2]  # old pos of moved piece
-        screen.blit(selected_square, (old_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+        GlobalVariables.screen.blit(selected_square, (old_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
                                       , old_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
-        screen.blit(selected_square, (new_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
+        GlobalVariables.screen.blit(selected_square, (new_square_to_select.position[1] * SQUARE_SIZE + BOARD_ADJUSTMENT
                                       , new_square_to_select.position[0] * SQUARE_SIZE + BOARD_ADJUSTMENT))
 
 
-def draw_letters_on_side(screen):
+def draw_letters_on_side():
     font = pygame.font.Font(None, 22)
     r = 8
     while r > 0:
         text = font.render(str(9 - r), True, white)
-        screen.blit(text, (8, r * SQUARE_SIZE - 15))
-        screen.blit(text, (594, r * SQUARE_SIZE - 15))
+        GlobalVariables.screen.blit(text, (8, r * SQUARE_SIZE - 15))
+        GlobalVariables.screen.blit(text, (594, r * SQUARE_SIZE - 15))
         text = font.render(chr(r + 96), True, white)
-        screen.blit(text, (r * SQUARE_SIZE - 13, 590))
-        screen.blit(text, (r * SQUARE_SIZE - 13, 6))
+        GlobalVariables.screen.blit(text, (r * SQUARE_SIZE - 13, 590))
+        GlobalVariables.screen.blit(text, (r * SQUARE_SIZE - 13, 6))
         r = r - 1
 
 
-def count_evaluation(matrix):
+def count_evaluation():
     GlobalVariables.w_team_value = 0
     GlobalVariables.b_team_value = 0
     for r in range(0, 8):
         for c in range(0, 8):
-            if matrix[r][c] is not None:  # we find a piece
-                if matrix[r][c].color == 'white':
-                    GlobalVariables.w_team_value = GlobalVariables.w_team_value + matrix[r][c].value
+            if GlobalVariables.board.matrix[r][c] is not None:  # we find a piece
+                if GlobalVariables.board.matrix[r][c].color == 'white':
+                    GlobalVariables.w_team_value = GlobalVariables.w_team_value + GlobalVariables.board.matrix[r][c].value
                 else:
-                    GlobalVariables.b_team_value = GlobalVariables.b_team_value + matrix[r][c].value
+                    GlobalVariables.b_team_value = GlobalVariables.b_team_value + GlobalVariables.board.matrix[r][c].value
 
 
-def draw_evaluation(screen):
+def draw_evaluation():
     all_value = GlobalVariables.w_team_value + GlobalVariables.b_team_value
     value_piece = 610 / all_value
-    pygame.draw.rect(screen, black, pygame.Rect(610, 0, 20, value_piece * GlobalVariables.b_team_value))
-    pygame.draw.rect(screen, white, pygame.Rect(610, value_piece * GlobalVariables.b_team_value, 20, value_piece * GlobalVariables.w_team_value))
+    pygame.draw.rect(GlobalVariables.screen, black, pygame.Rect(610, 0, 20, value_piece * GlobalVariables.b_team_value))
+    pygame.draw.rect(GlobalVariables.screen, white, pygame.Rect(610, value_piece * GlobalVariables.b_team_value, 20, value_piece * GlobalVariables.w_team_value))
 
 
 if __name__ == '__main__':

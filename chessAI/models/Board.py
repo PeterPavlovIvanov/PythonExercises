@@ -1,3 +1,4 @@
+import GlobalVariables
 from models.pieces.Bishop import Bishop
 from models.pieces.King import King
 from models.pieces.Knight import Knight
@@ -52,11 +53,11 @@ class Board:
                 , [P1, P2, P3, P4, P5, P6, P7, P8]
                 , [R1, N1, B1, Q, K, B2, N2, R2]]
 
-    def draw_board(self, screen):
+    def draw_board(self):
         for r in range(0, ROWS):
             for c in range(0, COLS):
                 piece = self.matrix[r][c]
                 if not piece is None:
-                    screen.blit(piece.image, (PIECE_ADJUSTMENT + piece.position[1] * SQUARE_SIZE
+                    GlobalVariables.screen.blit(piece.image, (PIECE_ADJUSTMENT + piece.position[1] * SQUARE_SIZE
                                               , PIECE_ADJUSTMENT + piece.position[0] * SQUARE_SIZE))
     pass
