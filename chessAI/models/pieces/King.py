@@ -318,8 +318,8 @@ class King(Piece):
 
         if not self.moved:  # if we haven't moved the king and we try to castle
             if ppy + 2 == npy and ppx == npx:  # we try to castle king side
-                if not self.is_going_into_free_square(prev_pos, (ppx, ppy + 1), GlobalVariables.board.matrix) \
-                        or not self.is_going_into_free_square(prev_pos, (ppx, ppy + 2), GlobalVariables.board.matrix):  # king's way is attacked
+                if not self.is_going_into_free_square(prev_pos, (ppx, ppy + 1)) \
+                        or not self.is_going_into_free_square(prev_pos, (ppx, ppy + 2)):  # king's way is attacked
                     return False
                 if GlobalVariables.board.matrix[ppx][ppy + 1] is None and GlobalVariables.board.matrix[ppx][ppy + 2] is None:  # square on the right of the king are empty
                     if self.color == 'white':  # white king castle

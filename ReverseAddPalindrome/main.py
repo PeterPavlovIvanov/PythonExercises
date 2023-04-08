@@ -18,7 +18,7 @@ def is_text_a_palindrome(num_text):
 
 # Enter a number, reverse it add the reversed to the original, repeat until the sum is palindrome
 num = int(input("Enter a number: "))
-count_max = 99
+count_max = 9999
 is_palindrome = 0
 not_found = 0
 while (is_palindrome != 1) & (not_found != 1):
@@ -37,4 +37,4 @@ while (is_palindrome != 1) & (not_found != 1):
 if is_palindrome == 1:
     print(f'Found Palindrome: {num}')
 else:
-    print(f'Could not find palindrome in 99 tries :(')
+    print(f'Could not find palindrome in {count_max} tries :(')

@@ -5,6 +5,7 @@ import pygame
 import GlobalVariables
 from GlobalVariables import *
 from models.Board import Board
+from models.PeshoBot import PeshoBot
 from models.pieces.Bishop import Bishop
 from models.pieces.King import King
 from models.pieces.Knight import Knight
@@ -30,9 +31,10 @@ def create_board_surface():
     return board_surface
 
 
-def drag_piece(selected_piece, drag_pos):
+def drag_piece(selected_piece, drag_pos, eventtype):
     if selected_piece is not None:
         GlobalVariables.screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
+        print(eventtype)
 
 
 def main():
@@ -48,11 +50,37 @@ def main():
     prev_square_x = -1
     prev_square_y = -1
     prev_piece = None
+    peshoBot = PeshoBot('black')
     while True:
         cur_pos = pygame.mouse.get_pos()
         events = pygame.event.get()
         cur_x = cur_pos[0] - BOARD_ADJUSTMENT
         cur_y = cur_pos[1] - BOARD_ADJUSTMENT
+
+        if peshoBot.next_move is not None:  # peshoBot is ready to move
+            selected_piece = peshoBot.pieceToMove  # duplicates the piece from the board in the hand
+            prev_square_x = peshoBot.pieceToMove.position[0]
+            prev_square_y = peshoBot.pieceToMove.position[1]
+            square_x = peshoBot.next_move[0]
+            square_y = peshoBot.next_move[1]
+
+            GlobalVariables.board.matrix[prev_square_x][prev_square_y] = None  # delete old state of piece from board
+            GlobalVariables.history.append(copy.copy(selected_piece))  # save the prev pos of the piece
+            selected_piece.new_position((square_x, square_y))  # prepare new piece position
+
+            if GlobalVariables.board.matrix[square_x][square_y] is not None:
+                if GlobalVariables.board.matrix[square_x][square_y].color != selected_piece.color:
+                    GlobalVariables.board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+            else:
+                GlobalVariables.board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
+
+            GlobalVariables.history.append(selected_piece)  # add the new state of the piece
+            peshoBot.SyncBoard()  # sync the board state with peshobots array of pieces
+            count_evaluation()  # count evaluation
+            GlobalVariables.turn = not GlobalVariables.turn  # change turns
+            peshoBot.next_move = None  # we remove the tuple so the other player may move
+            selected_piece = None  # clear selected piece that so we don't drag it, because we always drag if some piece is selected
+
         for e in events:  # user input
             if e.type == pygame.QUIT:
                 return
@@ -94,12 +122,16 @@ def main():
                         GlobalVariables.board.matrix[square_x][square_y] = selected_piece  # set new piece in the matrix
 
                     GlobalVariables.history.append(selected_piece)  # add the new state of the piece
+                    peshoBot.SyncBoard()  # sync the board state with peshobots array of pieces
                     count_evaluation()  # count evaluation
                     GlobalVariables.turn = not GlobalVariables.turn  # change turns
                 else:  # if the move is illegal
                     GlobalVariables.board.matrix[prev_square_x][prev_square_y] = prev_piece
                     square_x = prev_square_x  # retrieve previous position
                     square_y = prev_square_y  # retrieve previous position
+
+                if not GlobalVariables.turn:  # hardcore the Peshobot to be with black and move every time after we release button and its blacks turn
+                    peshoBot.GenerateRandomMove()
 
                 selected_piece = None  # Remove piece from hand
 
@@ -114,7 +146,7 @@ def main():
 
         # always enter dragging but only when selected_piece is not None we act inside
         # selected_piece will become not None when left button is pressed, when released it is again set to None
-        drag_piece(selected_piece, (cur_x, cur_y))
+        drag_piece(selected_piece, (cur_x, cur_y), e.type)
 
         # display update
         pygame.display.flip()

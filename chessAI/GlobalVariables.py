@@ -1,3 +1,4 @@
+from random import *
 SQUARE_SIZE = 70
 ROWS = COLS = 8
 BOARD_ADJUSTMENT = 25
@@ -16,3 +17,4 @@ history = []  # each element of the history contains 2 Pieces, the old and the n
 turn = True  # True - white's turn; False - black's turn
 screen = None
 board = None
+random = Random()
