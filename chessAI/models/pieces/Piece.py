@@ -253,7 +253,7 @@ class Piece:
                 if GlobalVariables.board.matrix[r][c] is not None:  # we found a piece
                     piece_full_type = str(type(GlobalVariables.board.matrix[r][c]))
                     if ('Bishop' in piece_full_type or 'Queen' in piece_full_type) \
-                            and GlobalVariables.board.matrix[r][c].color != color1:  # and is attack our king a.k.a its different color
+                            and GlobalVariables.board.matrix[r][c].color != self.color:  # and is attacking our king a.k.a its different color
                         return False  # it's invalid move
                     else:  # if it is not Bishop or Queen
                         break  # there won't be danger for our king

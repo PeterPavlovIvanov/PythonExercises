@@ -6,13 +6,6 @@ import GlobalVariables
 from GlobalVariables import *
 from models.Board import Board
 from models.PeshoBot import PeshoBot
-from models.pieces.Bishop import Bishop
-from models.pieces.King import King
-from models.pieces.Knight import Knight
-from models.pieces.Pawn import Pawn
-from models.pieces.Piece import Piece
-from models.pieces.Queen import Queen
-from models.pieces.Rook import Rook
 
 white = (255, 255, 255)
 black = (0, 0, 0)
@@ -31,10 +24,9 @@ def create_board_surface():
     return board_surface
 
 
-def drag_piece(selected_piece, drag_pos, eventtype):
+def drag_piece(selected_piece, drag_pos):
     if selected_piece is not None:
         GlobalVariables.screen.blit(selected_piece.image, (drag_pos[0], drag_pos[1]))
-        print(eventtype)
 
 
 def main():
@@ -79,6 +71,7 @@ def main():
             count_evaluation()  # count evaluation
             GlobalVariables.turn = not GlobalVariables.turn  # change turns
             peshoBot.next_move = None  # we remove the tuple so the other player may move
+            UpdateKingsPositions(selected_piece)  # save kings position before cleaning the selected_piece
             selected_piece = None  # clear selected piece that so we don't drag it, because we always drag if some piece is selected
 
         for e in events:  # user input
@@ -125,6 +118,7 @@ def main():
                     peshoBot.SyncBoard()  # sync the board state with peshobots array of pieces
                     count_evaluation()  # count evaluation
                     GlobalVariables.turn = not GlobalVariables.turn  # change turns
+                    UpdateKingsPositions(selected_piece)
                 else:  # if the move is illegal
                     GlobalVariables.board.matrix[prev_square_x][prev_square_y] = prev_piece
                     square_x = prev_square_x  # retrieve previous position
@@ -146,7 +140,7 @@ def main():
 
         # always enter dragging but only when selected_piece is not None we act inside
         # selected_piece will become not None when left button is pressed, when released it is again set to None
-        drag_piece(selected_piece, (cur_x, cur_y), e.type)
+        drag_piece(selected_piece, (cur_x, cur_y))
 
         # display update
         pygame.display.flip()
@@ -197,6 +191,15 @@ def draw_evaluation():
     value_piece = 610 / all_value
     pygame.draw.rect(GlobalVariables.screen, black, pygame.Rect(610, 0, 20, value_piece * GlobalVariables.b_team_value))
     pygame.draw.rect(GlobalVariables.screen, white, pygame.Rect(610, value_piece * GlobalVariables.b_team_value, 20, value_piece * GlobalVariables.w_team_value))
+
+
+def UpdateKingsPositions(selected_piece):  # update the kings position if moved
+    if selected_piece is not None:
+        if 'King' in str(type(selected_piece)):  # if it's a king
+            if selected_piece.color == 'white':  # for white king
+                GlobalVariables.w_king_position = selected_piece.position
+            else:  # for black king
+                GlobalVariables.b_king_position = selected_piece.position
 
 
 if __name__ == '__main__':
